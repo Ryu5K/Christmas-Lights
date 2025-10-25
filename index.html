@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christmas Lights Grid</title>
+<style>
+  body {
+    background: #111;
+    color: white;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+  }
+  canvas {
+    border: 2px solid #444;
+    image-rendering: pixelated;
+    width: 800px;
+    height: 800px;
+    margin-bottom: 10px;
+  }
+  #count {
+    font-size: 1.3em;
+    color: #ff0;
+    margin: 10px 0;
+  }
+  #instructions {
+    width: 800px;
+    max-height: 250px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  #instructions h3 {
+    color: #0ff;
+    margin-top: 0;
+  }
+  .instruction {
+    font-family: monospace;
+    margin: 3px 0;
+    padding: 3px 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<h2>🎄 Christmas Light Grid Visualization 🎄</h2>
+<canvas id="lightCanvas" width="1000" height="1000"></canvas>
+<p id="count">Loading...</p>
+
+<div id="instructions">
+  <h3>📜 Executed Instructions</h3>
+  <div id="instructionList"></div>
+</div>
+
+<script>
+async function drawGrid() {
+  const response = await fetch("grid.json?nocache=" + Date.now());
+  const data = await response.json();
+  const grid = data.grid;
+  const count = data.count;
+  const instructions = data.instructions || [];
+
+  // Display total lights on
+  document.getElementById("count").textContent = `💡 Lights On: ${count.toLocaleString()}`;
+
+  // Display instruction list
+  const listContainer = document.getElementById("instructionList");
+  listContainer.innerHTML = "";
+  instructions.forEach((instr, i) => {
+    const div = document.createElement("div");
+    div.className = "instruction";
+    div.textContent = `${i + 1}. ${instr}`;
+    listContainer.appendChild(div);
+  });
+
+  // Draw light grid
+  const canvas = document.getElementById("lightCanvas");
+  const ctx = canvas.getContext("2d");
+  const width = grid[0].length;
+  const height = grid.length;
+
+  const imgData = ctx.createImageData(width, height);
+  const pixels = imgData.data;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      if (grid[y][x]) {
+        pixels[i] = 255; pixels[i+1] = 255; pixels[i+2] = 0;  // yellow
+      } else {
+        pixels[i] = 0; pixels[i+1] = 0; pixels[i+2] = 0;      // black
+      }
+      pixels[i+3] = 255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+drawGrid();
+</script>
+</body>
+</html>
