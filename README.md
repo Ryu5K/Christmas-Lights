@@ -1,34 +1,21 @@
-# Coding Projects
+# Probably a Fire Hazard 🎄
 
-Welcome! This repository is set up to be shared on GitHub.
+A Python + HTML visualization of the "Probably a Fire Hazard" grid-light problem.
 
-## Overview
-- Add your project files into this folder.
-- Update this README with a clear description, setup steps, and usage.
+## Features
+- Simulates a 1000×1000 grid of lights (on/off states)
+- Executes `instructions.txt` commands
+- Displays results in a visual grid via `index.html`
+- Shows total number of lights on
+- Lists each executed instruction
 
-## Getting Started
-1. Ensure you have Git installed.
-2. Add your code, then commit and push to GitHub (instructions below).
-
-## Commit & Push
+## How to Run Locally
 ```bash
-# Stage and commit your changes
-git add -A
-git commit -m "Initial commit"
+# 1. Generate grid.json from Python
+python Fire Hazard Project.py
 
-# Add your GitHub remote (replace URL)
-git remote add origin https://github.com/<your-username>/<your-repo>.git
+# 2. Start a local web server
+python -m http.server
 
-# Push the main branch
-git branch -M main
-git push -u origin main
-```
-
-## Contributing
-- Use feature branches and pull requests.
-- Add or update tests where applicable.
-- Keep commits small and descriptive.
-
-## License
-Choose and add a license file (e.g., MIT, Apache-2.0) if you plan to share publicly.
-
+# 3. Open in browser
+http://localhost:8000/index.html
