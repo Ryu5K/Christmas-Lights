@@ -44,17 +44,21 @@ def count_lights_on(grid):
 
 def export_grid(grid, filename="grid.json"):
     """
-    Export the current grid state, total count, and executed instructions
+    Export the current grid state, total on/off counts, and executed instructions
     for front-end visualization.
     """
     lights_on = sum(sum(1 for cell in row if cell) for row in grid)
+    total_lights = len(grid) * len(grid[0])
+    lights_off = total_lights - lights_on
 
     # read instructions so the front end can display them
     with open("instructions.txt", "r") as f:
         instructions = [line.strip() for line in f if line.strip()]
 
     data = {
-        "count": lights_on,
+        "count_on": lights_on,
+        "count_off": lights_off,
+        "total": total_lights,
         "grid": grid,
         "instructions": instructions
     }
@@ -62,7 +66,9 @@ def export_grid(grid, filename="grid.json"):
     import json
     with open(filename, "w") as f:
         json.dump(data, f)
-    print(f"Grid exported with {lights_on} lights on and {len(instructions)} instructions.")
+
+    print(f"Grid exported: {lights_on} lights ON, {lights_off} lights OFF.")
+
 
 
 

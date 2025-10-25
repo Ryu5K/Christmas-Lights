@@ -23,29 +23,9 @@
     margin-bottom: 10px;
   }
   #count {
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #ff0;
-    margin: 10px 0;
-  }
-  #instructions {
-    width: 800px;
-    max-height: 250px;
-    overflow-y: auto;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid #333;
-    padding: 10px;
-    border-radius: 8px;
-  }
-  #instructions h3 {
-    color: #0ff;
-    margin-top: 0;
-  }
-  .instruction {
-    font-family: monospace;
-    margin: 3px 0;
-    padding: 3px 6px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 4px;
+    text-align: center;
   }
 </style>
 </head>
@@ -54,54 +34,47 @@
 <canvas id="lightCanvas" width="1000" height="1000"></canvas>
 <p id="count">Loading...</p>
 
-<div id="instructions">
-  <h3>📜 Executed Instructions</h3>
-  <div id="instructionList"></div>
-</div>
-
 <script>
 async function drawGrid() {
-  const response = await fetch("grid.json?nocache=" + Date.now());
-  const data = await response.json();
-  const grid = data.grid;
-  const count = data.count;
-  const instructions = data.instructions || [];
+  try {
+    const response = await fetch("grid.json?nocache=" + Date.now());
+    const data = await response.json();
+    const grid = data.grid;
+    const countOn = data.count_on;
+    const countOff = data.count_off;
 
-  // Display total lights on
-  document.getElementById("count").textContent = `💡 Lights On: ${count.toLocaleString()}`;
+    document.getElementById("count").innerHTML =
+      `💡 Lights On: ${countOn.toLocaleString()}<br>` +
+      `🌑 Lights Off: ${countOff.toLocaleString()}<br>` +
+      `Total: ${(countOn + countOff).toLocaleString()}`;
 
-  // Display instruction list
-  const listContainer = document.getElementById("instructionList");
-  listContainer.innerHTML = "";
-  instructions.forEach((instr, i) => {
-    const div = document.createElement("div");
-    div.className = "instruction";
-    div.textContent = `${i + 1}. ${instr}`;
-    listContainer.appendChild(div);
-  });
+    const canvas = document.getElementById("lightCanvas");
+    const ctx = canvas.getContext("2d");
+    const width = grid[0].length;
+    const height = grid.length;
 
-  // Draw light grid
-  const canvas = document.getElementById("lightCanvas");
-  const ctx = canvas.getContext("2d");
-  const width = grid[0].length;
-  const height = grid.length;
+    const imgData = ctx.createImageData(width, height);
+    const pixels = imgData.data;
 
-  const imgData = ctx.createImageData(width, height);
-  const pixels = imgData.data;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = (y * width + x) * 4;
-      if (grid[y][x]) {
-        pixels[i] = 255; pixels[i+1] = 255; pixels[i+2] = 0;  // yellow
-      } else {
-        pixels[i] = 0; pixels[i+1] = 0; pixels[i+2] = 0;      // black
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const i = (y * width + x) * 4;
+        if (grid[y][x]) {
+          pixels[i] = 255; pixels[i + 1] = 255; pixels[i + 2] = 0;   // Yellow (on)
+        } else {
+          pixels[i] = 30; pixels[i + 1] = 30; pixels[i + 2] = 30;    // Dim gray (off)
+        }
+        pixels[i + 3] = 255;
       }
-      pixels[i+3] = 255;
     }
+    ctx.putImageData(imgData, 0, 0);
+
+  } catch (err) {
+    document.body.innerHTML += `<p style="color:red;">Error loading grid.json: ${err}</p>`;
+    console.error("Error loading grid.json:", err);
   }
-  ctx.putImageData(imgData, 0, 0);
 }
+
 drawGrid();
 </script>
 </body>
